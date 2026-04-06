@@ -6,9 +6,9 @@ from django.views import View
 from .forms import LoginForm
 
 
-@login_requried
+@login_required
 def dashboard(request):
-    return render(request, 'dashboard.html', {'section': 'dashboard'}
+    return render(request, 'dashboard.html', {'section': 'dashboard'})
 
 
 class UserLoginView(View):
