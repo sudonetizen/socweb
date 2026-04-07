@@ -3,13 +3,26 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
-from .forms import LoginForm
+from .forms import LoginForm, UserRegistrationForm 
 
 
 @login_required
 def dashboard(request):
     return render(request, 'dashboard.html', {'section': 'dashboard'})
 
+
+class UserRegisterView(View):
+    def get(self, request):
+        user_form = UserRegistrationForm()
+        return render(request, 'register.html', {'user_form': user_form})
+
+    def post(self, request):
+        user_form = UserRegistrationForm(request.POST)
+        if user_form.is_valid():
+            new_user = user_form.save(commit=False)
+            new_user.set_password(user_form.cleaned_data['password'])
+            new_user.save()
+            return render(request, 'register_done.html', {'new_user': new_user})
 
 class UserLoginView(View):
     def get(self, request):
