@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
@@ -61,6 +62,10 @@ class UserEditView(LoginRequiredMixin, View):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
+
+            messages.success(request, 'Profile updated successfully')
+        else:
+            messages.error(request, 'Error updating your profile')
         
         return render(request, 'edit.html', {'user_form': user_form, 'profile_form': profile_form})
 
