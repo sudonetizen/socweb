@@ -51,4 +51,13 @@
             {% endblock %}
         </div>
     </body>
+
+    <script>
+        setTimeout(function() {
+            let messages = document.querySelectorAll(".messages")
+            messages.forEach(function(element) {
+                element.remove();
+            });
+        }, 3000);
+    </script>
 </html>
