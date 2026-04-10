@@ -28,6 +28,10 @@ class UserRegisterView(View):
             Profile.objects.create(user=new_user)
 
             return render(request, 'register_done.html', {'new_user': new_user})
+        else:
+            user_form = UserRegistrationForm()
+            return render(request, 'register.html', {'user_form': user_form})
+
 
 class UserLoginView(View):
     def get(self, request):
