@@ -29,6 +29,7 @@ class UserRegisterView(View):
 
             return render(request, 'register_done.html', {'new_user': new_user})
         else:
+            messages.error(request, f'Invalid fields: {", ".join(list(user_form.errors.keys()))}')
             user_form = UserRegistrationForm()
             return render(request, 'register.html', {'user_form': user_form})
 
