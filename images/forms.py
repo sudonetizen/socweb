@@ -18,7 +18,7 @@ class ImageCreateForm(forms.ModelForm):
         valid_extensions = ['jpg', 'jpeg', 'png']
         extension = url.rsplit('.', 1)[1].lower()
 
-        if extension not in valid_extendsions:
+        if extension not in valid_extensions:
             raise forms.ValidationError('Invalid image extension!')
         
         return url
@@ -27,10 +27,10 @@ class ImageCreateForm(forms.ModelForm):
     def save(self, force_insert=False, force_update=False, commit=True):
         image = super().save(commit=False)
         image_url = self.cleaned_data['url']
-        name = slufigy(image.title)
+        name = slugify(image.title)
         extension = image_url.rsplit('.', 1)[1].lower()        
 
-        image_name = f'{name}.{extentsion}'
+        image_name = f'{name}.{extension}'
         response = requests.get(image_url)
         
         image.image.save(
