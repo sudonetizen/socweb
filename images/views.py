@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -24,6 +25,24 @@ class ImageCreateView(LoginRequiredMixin, View):
             return redirect(new_image.get_absolute_url())
 
         return render(request, 'img_create.html', {'section':'images', 'form':form}) 
+
+
+class ImageLikeView(LoginRequiredMixin, View):
+    def post(self, request):
+        image_id = request.POST.get('id')
+        action = request.POST.get('action')
+        if image_id and action:
+            try:
+                image = Image.objects.get(id=image_id)
+                if action == 'like':
+                    image.users_like.add(request.user)
+                else:
+                    image.users_like.remove(request.user)
+                return JsonResponse({'status':'ok'})
+            except Image.DoesNotExist:
+                pass
+        
+        return JsonResponse({'status':'error'})
 
 
 def image_detail(request, id, slug):
