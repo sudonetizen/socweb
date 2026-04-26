@@ -37,3 +37,41 @@
         </div>
     {% endwith %}
 {% endblock %}
+
+
+{% block domready %}
+    const url = '{% url "images:like" %}';
+    let options = {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        mode: 'same-origin'
+    }
+    document.querySelector('a.like').addEventListener('click', function(e){
+        e.preventDefault();
+        let likeButton = this;
+
+        // request body
+        let formData = new FormData();
+        formData.append('id', likeButton.dataset.id);
+        formData.append('action', likeButton.dataset.action);
+        options['body'] = formData;
+
+        // send request
+        const sendRequest = async (url, options) => {
+            const response = await fetch(url, options);
+            const data = await response.json();
+            
+            if(data['status'] === 'ok') {
+                let previousAction = likeButton.dataset.action;
+                let action = previousAction == 'like' ? 'unlike' : 'like';        
+                likeButton.dataset.action = action;
+                likeButton.innerHTML = action;
+
+                let likeCount = document.querySelector('span.count .total');
+                let totalLikes = parseInt(likeCount.innerHTML);
+                likeCount.innerHTML = previousAction === 'like' ? totalLikes + 1 : totalLikes - 1;
+            }
+        };
+        sendRequest(url, options);
+    });
+{% endblock %}
