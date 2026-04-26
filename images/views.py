@@ -1,4 +1,5 @@
-from django.http import JsonResponse
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -43,6 +44,27 @@ class ImageLikeView(LoginRequiredMixin, View):
                 pass
         
         return JsonResponse({'status':'error'})
+
+
+class ImageListView(LoginRequiredMixin, View):
+    def post(self, request):
+        images = Image.objects.all()
+        paginator = Paginator(images, 8)
+        page = request.GET.get('page')
+        images_only = request.GET.get('images_only')
+
+        try:
+            images = paginator.page(page)
+        except PageNotAnInteger:
+            images = paginator.page(1)
+        except EmptyPage:
+            if images_only:
+                return HttpResponse('')
+            images = paginator.page(paginator.num_pages)
+
+        if images_only:
+            return render(request, 'list_img.html', {'section':'images', 'images':images})
+        return render(request, 'list_img2.html', {'section':'images', 'images':images})
 
 
 def image_detail(request, id, slug):
