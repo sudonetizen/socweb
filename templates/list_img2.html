@@ -8,3 +8,36 @@
         {% include "list_img.html" %} 
     </div>
 {% endblock %}
+
+{% block domready %}
+    var page = 1;
+    var emptyPage = false;
+    var blockRequest = false;
+
+window.addEventListener('scroll', function(e) {
+    var margin = document.body.clientHeight - window.innerHeight - 200;
+    if (window.pageYOffset > margin && !emptyPage && !blockRequest) {
+        blockRequest = true;
+        page += 1;
+        
+        const sendRequest = async (qpage) => {
+            const response = await fetch(qpage);
+            const html = await response.text();
+            
+            if(html === '') {
+                emptyPage = true;
+            }
+            else {
+                var imageList = document.getElementById('image-list');
+                imageList.insertAdjacentHTML('beforeEnd', html);
+                blockRequest = false;
+            }
+        };
+        sendRequest('?images_only=1&page=' + page);
+    }
+});
+
+    const scrollEvent = new Event('scroll');
+    window.dispatchEvent(scrollEvent);
+
+{% endblock %}

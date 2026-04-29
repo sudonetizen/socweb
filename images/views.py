@@ -47,7 +47,7 @@ class ImageLikeView(LoginRequiredMixin, View):
 
 
 class ImageListView(LoginRequiredMixin, View):
-    def post(self, request):
+    def get(self, request):
         images = Image.objects.all()
         paginator = Paginator(images, 8)
         page = request.GET.get('page')
