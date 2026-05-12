@@ -1,9 +1,9 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 
@@ -73,3 +73,9 @@ class UserEditView(LoginRequiredMixin, View):
         
         return render(request, 'edit.html', {'user_form': user_form, 'profile_form': profile_form})
 
+User = get_user_model()
+
+@login_required
+def user_list(request):
+    users = User.objects.filter(is_active=True)
+    return render(request, 'user_list.html', {'section': 'people', 'users': users})
