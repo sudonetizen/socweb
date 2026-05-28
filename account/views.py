@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.views.decorators.http import require_POST
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
+from .models import Contact, Profile
 
 
 @login_required
