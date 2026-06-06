@@ -13,7 +13,15 @@ from actions.utils import create_action
 
 @login_required
 def dashboard(request):
-    return render(request, 'dashboard.html', {'section': 'dashboard'})
+    actions = Action.objects.exclude(user=request.user)
+    following_ids = request.user.following.values_list('id', flat=True)
+    
+    if following_ids:
+        actions = actions.filter(user_id__in=following_ids)
+    
+    actions = actions[:10]
+    
+    return render(request, 'dashboard.html', {'section': 'dashboard', 'actions': actions})
 
 
 class UserRegisterView(View):
