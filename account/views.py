@@ -9,6 +9,7 @@ from django.views.decorators.http import require_POST
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 from .models import Contact, Profile
 from actions.utils import create_action
+from actions.models import Action
 
 
 @login_required
@@ -19,7 +20,7 @@ def dashboard(request):
     if following_ids:
         actions = actions.filter(user_id__in=following_ids)
     
-    actions = actions[:10]
+    actions = actions.select_related('user', 'user__profile').prefetch_related('target')[:10]
     
     return render(request, 'dashboard.html', {'section': 'dashboard', 'actions': actions})
 
