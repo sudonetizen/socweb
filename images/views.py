@@ -9,6 +9,7 @@ from django.views.generic import View
 from .forms import ImageCreateForm
 from .models import Image
 from actions.utils import create_action
+from django.contrib.auth.decorators import login_required
 
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
@@ -79,3 +80,14 @@ def image_detail(request, id, slug):
     r.zincrby('image_ranking', 1, image.id)
     return render(request, 'img_detail.html', {'section':'images', 'image': image, 'total_views': total_views})
 
+
+@login_required
+def image_ranking(request):
+    image_ranking = r.zrange('image_ranking', 0, -1, desc=True)[:10]
+    image_ranking_ids = [int(id) for id in image_ranking]
+
+    most_viewed = list(Image.objects.filter(id__in=image_ranking_ids))
+
+    most_viewed.sort(key=lambda x: image_ranking_ids.index(x.id))
+
+    return render(request, 'img_ranking.html', {'section': 'images', 'most_viewed': most_viewed})
