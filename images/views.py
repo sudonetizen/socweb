@@ -1,3 +1,5 @@
+import redis
+from django.conf import settings
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
@@ -8,6 +10,7 @@ from .forms import ImageCreateForm
 from .models import Image
 from actions.utils import create_action
 
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 class ImageCreateView(LoginRequiredMixin, View):
     def get(self, request):
@@ -72,5 +75,6 @@ class ImageListView(LoginRequiredMixin, View):
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
-    return render(request, 'img_detail.html', {'section':'images', 'image': image})
+    total_views = r.incr(f'image:{image.id}:views')
+    return render(request, 'img_detail.html', {'section':'images', 'image': image, 'total_views': total_views})
 
